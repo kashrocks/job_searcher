@@ -8,9 +8,10 @@ cwd = os.getcwd()
 in_lever = 0
 
 workbook = xlrd.open_workbook(cwd + '/job_search.xlsx')
-sheet = workbook.sheet_by_name('Sheet1')
+sheet = workbook.sheet_by_name('Sheet1') 
 
-for i in range(1, 46):
+has_position = []
+for i in range(1, 1280):
     company = sheet.cell(i, 0).value
     url = 'https://jobs.lever.co/' + company
     response = requests.get(url)
@@ -23,17 +24,21 @@ for i in range(1, 46):
     b = soup.findAll('h5')
 
     print('')
-    print(company + '---------------------------')
-
+    print(company + ' ---------------------------' + str(i))
+    has_position_flg = False
     for title in b:
-        if title != 'source':
+        if title == 'source':
             continue
-        if 'intern' in title.next_element.lower():
+        if 'intern' in title.next_element.lower() and 'international' not in title.next_element.lower() and 'internal' not in title.next_element.lower(): 
+            has_position_flg = True
             print(title.next_element)
+    if has_position_flg:
+        has_position.append(url)
 
-print('')
-print('Total companies in lever: ' + str(in_lever))
+for url in has_position:
+    print(url)
 
+print(len(has_position))
 
 # -----------------------------------
 # hits all companies and checks whether a lever plat form exists or not
